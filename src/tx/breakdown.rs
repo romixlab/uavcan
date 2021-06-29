@@ -153,11 +153,11 @@ pub struct Breakdown<'a, Frame: CanFrame<MTU>, const MTU: usize> {
 }
 
 impl<'a, Frame: CanFrame<MTU>, const MTU: usize> Breakdown<'a, Frame, MTU> {
-    pub fn new(payload: &'a [u8], can_id: u32) -> Self {
+    pub fn new(payload: &'a [u8], transfer_sequence_number: TransferId,  can_id: u32) -> Self {
         let breakdown_kind = breakdown_kind_for_payload::<MTU>(payload);
         let tail_byte = match breakdown_kind {
-            BreakdownKind::SingleFrame => TailByte::single_frame(TransferId::new()),
-            BreakdownKind::MultiFrame(_) => TailByte::start_of_multi_frame(TransferId::new()),
+            BreakdownKind::SingleFrame => TailByte::single_frame(transfer_sequence_number),
+            BreakdownKind::MultiFrame(_) => TailByte::start_of_multi_frame(transfer_sequence_number),
         };
 
         Self {

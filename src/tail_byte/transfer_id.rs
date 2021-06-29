@@ -14,6 +14,16 @@ pub struct TransferId {
 // values instead of internal mutability.
 // TODO: Consider generalizing the concept of TransferId instead of hardcoding the uavcan/can modulo 32 version.
 impl TransferId {
+    pub const fn new_checked(seq: u8) -> Option<Self> {
+        if seq < 32 {
+            Some(TransferId {
+                bytes: [seq]
+            })
+        } else {
+            None
+        }
+    }
+
     pub fn difference(&self, other: TransferId) -> u8 {
         let mut difference = (other.transfer_id() as i16) - (self.transfer_id() as i16);
         if difference < 0 {

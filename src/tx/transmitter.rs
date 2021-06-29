@@ -4,6 +4,7 @@ use crate::{
     session_id::{can_id_for_session_kind, SessionKind},
     CanFrame,
 };
+use crate::tail_byte::TransferId;
 
 pub trait Transmitter<Frame: CanFrame<MTU>, const MTU: usize> {
     type Error;
@@ -20,9 +21,10 @@ pub fn send<T: Transmitter<Frame, MTU>, Frame: CanFrame<MTU>, const MTU: usize>(
     payload: &[u8],
     kind: SessionKind,
     priority: TransferPriority,
+    sequence_number: TransferId
 ) -> Result<(), T::Error> {
     let can_id = can_id_for_session_kind(kind, priority);
-    let breakdown = Breakdown::new(payload, can_id);
+    let breakdown = Breakdown::new(payload, sequence_number, can_id);
 
     transmitter.ensure_available_space(breakdown.frames_count())?;
     for frame in breakdown {
